@@ -1,10 +1,18 @@
 package com.bytedance.android.aabresguard.executors;
 
+import static com.android.tools.build.bundletool.model.utils.files.FilePreconditions.checkFileDoesNotExist;
+import static com.bytedance.android.aabresguard.bundle.AppBundleUtils.getEntryNameByResourceName;
+import static com.bytedance.android.aabresguard.bundle.AppBundleUtils.getTypeNameByResourceName;
+import static com.bytedance.android.aabresguard.bundle.ResourcesTableOperation.checkConfiguration;
+import static com.bytedance.android.aabresguard.bundle.ResourcesTableOperation.updateEntryConfigValueList;
+import static com.bytedance.android.aabresguard.utils.FileOperation.getFilePrefixByFileName;
+import static com.bytedance.android.aabresguard.utils.FileOperation.getNameFromZipFilePath;
+import static com.bytedance.android.aabresguard.utils.FileOperation.getParentFromZipFilePath;
+
 import com.android.aapt.Resources;
 import com.android.tools.build.bundletool.model.AppBundle;
 import com.android.tools.build.bundletool.model.BundleModule;
 import com.android.tools.build.bundletool.model.BundleModuleName;
-import com.android.tools.build.bundletool.model.InMemoryModuleEntry;
 import com.android.tools.build.bundletool.model.ModuleEntry;
 import com.android.tools.build.bundletool.model.ResourceTableEntry;
 import com.android.tools.build.bundletool.model.ZipPath;
@@ -19,6 +27,7 @@ import com.bytedance.android.aabresguard.utils.FileOperation;
 import com.bytedance.android.aabresguard.utils.TimeClock;
 import com.bytedance.android.aabresguard.utils.Utils;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.ByteSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,15 +45,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipFile;
-
-import static com.android.tools.build.bundletool.model.utils.files.FilePreconditions.checkFileDoesNotExist;
-import static com.bytedance.android.aabresguard.bundle.AppBundleUtils.getEntryNameByResourceName;
-import static com.bytedance.android.aabresguard.bundle.AppBundleUtils.getTypeNameByResourceName;
-import static com.bytedance.android.aabresguard.bundle.ResourcesTableOperation.checkConfiguration;
-import static com.bytedance.android.aabresguard.bundle.ResourcesTableOperation.updateEntryConfigValueList;
-import static com.bytedance.android.aabresguard.utils.FileOperation.getFilePrefixByFileName;
-import static com.bytedance.android.aabresguard.utils.FileOperation.getNameFromZipFilePath;
-import static com.bytedance.android.aabresguard.utils.FileOperation.getParentFromZipFilePath;
 
 /**
  * Created by YangJing on 2019/10/14 .
@@ -266,7 +266,8 @@ public class ResourcesObfuscator {
             String bundleRawPath = bundleModule.getName().getName() + "/" + entry.getPath().toString();
             String obfuscatedPath = obfuscatedEntryMap.get(bundleRawPath);
             if (obfuscatedPath != null) {
-                ModuleEntry obfuscatedEntry = InMemoryModuleEntry.ofFile(obfuscatedPath, AppBundleUtils.readByte(bundleZipFile, entry, bundleModule));
+                ModuleEntry obfuscatedEntry = ModuleEntry.builder().setPath(ZipPath.create(obfuscatedPath)).setContent(ByteSource.wrap(AppBundleUtils.readByte(bundleZipFile, entry, bundleModule))).build();
+                //InMemoryModuleEntry.ofFile(obfuscatedPath, AppBundleUtils.readByte(bundleZipFile, entry, bundleModule));
                 obfuscateEntries.add(obfuscatedEntry);
             } else {
                 obfuscateEntries.add(entry);

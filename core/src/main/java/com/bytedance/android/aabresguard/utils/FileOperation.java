@@ -3,6 +3,7 @@ package com.bytedance.android.aabresguard.utils;
 import com.android.tools.build.bundletool.model.ZipPath;
 import com.android.tools.build.bundletool.model.utils.files.BufferedIo;
 import com.android.tools.build.bundletool.model.utils.files.FileUtils;
+import com.bytedance.android.aabresguard.bundle.AppBundleUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -133,7 +134,7 @@ public class FileOperation {
     public static long getZipPathFileSize(ZipFile zipFile, ZipEntry zipEntry) {
         long size = 0;
         try {
-            InputStream is = BufferedIo.inputStream(zipFile, zipEntry);
+            InputStream is = AppBundleUtils.makeBuffered(zipFile.getInputStream(zipEntry));
             size = is.available();
             is.close();
         } catch (IOException e) {

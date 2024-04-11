@@ -5,14 +5,14 @@ buildscript {
     repositories {
         google()
         jcenter()
-        if ("true".equalsIgnoreCase(System.getProperty('useLocalMaven', "false"))) {
-            println "use local repo"
-            mavenLocal()
-        } else {
-            println "use remove repo"
-            maven { url findProperty("RELEASE_REPOSITORY_URL") }
-            maven { url findProperty("SNAPSHOT_REPOSITORY_URL") }
-        }
+//        if ("true".equalsIgnoreCase(System.getProperty('useLocalMaven', "false"))) {
+//            println "use local repo"
+//            mavenLocal()
+//        } else {
+//            println "use remove repo"
+//            maven { url findProperty("RELEASE_REPOSITORY_URL") }
+//            maven { url findProperty("SNAPSHOT_REPOSITORY_URL") }
+//        }
         maven {
             url "https://plugins.gradle.org/m2/"
         }
@@ -34,12 +34,12 @@ allprojects {
     repositories {
         google()
         jcenter()
-        if ("true".equalsIgnoreCase(System.getProperty('useLocalMaven', "false"))) {
-            mavenLocal()
-        } else {
-            maven { url findProperty("RELEASE_REPOSITORY_URL") }
-            maven { url findProperty("SNAPSHOT_REPOSITORY_URL") }
-        }
+//        if ("true".equalsIgnoreCase(System.getProperty('useLocalMaven', "false"))) {
+//            mavenLocal()
+//        } else {
+//            maven { url findProperty("RELEASE_REPOSITORY_URL") }
+//            maven { url findProperty("SNAPSHOT_REPOSITORY_URL") }
+//        }
     }
 }
 

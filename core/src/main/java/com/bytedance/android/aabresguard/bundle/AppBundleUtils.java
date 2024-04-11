@@ -9,12 +9,16 @@ import com.android.tools.build.bundletool.model.utils.files.BufferedIo;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import static com.bytedance.android.aabresguard.utils.FileOperation.getZipPathFileSize;
+
+import javax.annotation.WillCloseWhenClosed;
 
 /**
  * Created by YangJing on 2019/10/14 .
@@ -39,7 +43,7 @@ public class AppBundleUtils {
         String path = String.format("%s/%s", bundleModule.getName().getName(), entry.getPath().toString());
         ZipEntry bundleConfigEntry = bundleZipFile.getEntry(path);
         try {
-            InputStream is = BufferedIo.inputStream(bundleZipFile, bundleConfigEntry);
+            InputStream is = makeBuffered(bundleZipFile.getInputStream(bundleConfigEntry));
             String md5 = bytesToHexString(DigestUtils.md5(is));
             is.close();
             return md5;
@@ -51,10 +55,16 @@ public class AppBundleUtils {
     public static byte[] readByte(ZipFile bundleZipFile, ModuleEntry entry, BundleModule bundleModule) throws IOException {
         String path = String.format("%s/%s", bundleModule.getName().getName(), entry.getPath().toString());
         ZipEntry bundleConfigEntry = bundleZipFile.getEntry(path);
-        InputStream is = BufferedIo.inputStream(bundleZipFile, bundleConfigEntry);
+        InputStream is = makeBuffered(bundleZipFile.getInputStream(bundleConfigEntry));
         byte[] bytes = IOUtils.toByteArray(is);
         is.close();
         return bytes;
+    }
+
+    public static InputStream makeBuffered(@WillCloseWhenClosed InputStream is) {
+        return (is instanceof BufferedInputStream || is instanceof ByteArrayInputStream)
+                ? is
+                : new BufferedInputStream(is);
     }
 
     public static String bytesToHexString(byte[] src) {
